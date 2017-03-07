@@ -1,0 +1,16 @@
+URL API LAPAR :
+
+Proses Login
+URL 		: http://localhost/lapar/v1/login
+Method 		: POST
+Parameter	: Email, Password
+
+Proses Registrasi
+URL		: http://localhost/lapar/v1/register
+Method		: POST
+Parameter	: Name, Email, Password, Mobile
+
+Proses Update Profile
+URL		: http://localhost/lapar/v1/register
+Method		: GET
+Parameter	: id, Authorization
