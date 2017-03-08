@@ -68,6 +68,37 @@ class DbHandler {
     }
 
     /**
+     * Updating Profile User
+     * By : Muhammad Sholihin : 08/03/2017
+     * @param String $id id of the user
+     * @param String $name name text
+     * @param String $email email status
+     */
+    public function updateUser($id, $name, $email) {
+        $stmt = $this->conn->prepare("UPDATE users SET name = ?, email = ? WHERE id = ?");
+        $stmt->bind_param("ssi", $name, $email, $id);
+        $stmt->execute();
+        $num_affected_rows = $stmt->affected_rows;
+
+        $result = $stmt->execute();
+        
+        $stmt->close();
+
+        // Check for successful insertion
+            if ($result) {
+                $stmt = $this->conn->prepare("SELECT * FROM users WHERE email = ?");
+                $stmt->bind_param("s", $email);
+                $stmt->execute();
+                $user = $stmt->get_result()->fetch_assoc();
+                $stmt->close();
+                // User successfully inserted
+                return $user;
+            }
+
+        return $num_affected_rows > 0;
+    }
+
+    /**
      * Checking user login
      * @param String $email User login email id
      * @param String $password User login password

@@ -140,19 +140,43 @@ $app->post('/login', function() use ($app) {
 
 /**
  * User Profile
- * url - /profile
- * method - GET
+ * By : Muhammad Sholihin : 08/03/2017
+ * url - /profile_update
+ * method - POST
  * params - email, password
  */
-// $app->post('/profile_update/:id', function() use ($app) {
-//         // check for required params
-//         verifyRequiredParams(array('name', 'email'));
+$app->post('/profile_update/:id', function($id) use($app) {
+        // check for required params
+        verifyRequiredParams(array('name', 'email'));
 
-//             // reading post params
-//             $name = $app->request()->post('name');
-//             $email = $app->request()->post('email');
-//             $response = array();
-// }
+        // reading post params
+        //global $id; 
+        $name = $app->request()->post('name');
+        $email = $app->request()->post('email');
+            
+        // validating email address
+        validateEmail($email);
+
+        $db = new DbHandler();
+        $response = array();
+
+        $user = $db->updateUser($id, $name, $email);
+        if($user){
+            // User Update Successfully
+            $response["error"] = false;
+            $response["id"] = $user["id"];
+            $response["user"]['name'] = $user['name'];
+            $response["user"]['email'] = $user['email'];
+            $response["message"] = "User updated successfully";
+        } else{
+            // User Failde Update
+            $response["error"] = true;
+            $response["message"] = "User failed to update. Please try again!";
+        }
+        echoRespnse(200, $response);
+    });
+
+
 /*
  * ------------------------ METHODS WITH AUTHENTICATION ------------------------
  */
