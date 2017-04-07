@@ -18,7 +18,7 @@ class DbHandler {
         $this->conn = $db->connect();
     }
 
-    /* ------------- `users` table method ------------------ */
+    /* ------------- `tb_m_users` table method ------------------ */
 
     /**
      * Creating new user
@@ -39,7 +39,7 @@ class DbHandler {
             $api_key = $this->generateApiKey();
 
             // insert query
-            $stmt = $this->conn->prepare("INSERT INTO users(name, email, mobile, password_hash, api_key, status) values(?, ?, ?, ?, ?, 1)");
+            $stmt = $this->conn->prepare("INSERT INTO tb_m_users(name, email, mobile, password_hash, api_key, status) values(?, ?, ?, ?, ?, 1)");
             $stmt->bind_param("sssss", $name, $email, $mobile, $password_hash, $api_key);
 
             $result = $stmt->execute();
@@ -48,7 +48,7 @@ class DbHandler {
 
             // Check for successful insertion
             if ($result) {
-                $stmt = $this->conn->prepare("SELECT * FROM users WHERE email = ?");
+                $stmt = $this->conn->prepare("SELECT * FROM tb_m_users WHERE email = ?");
                 $stmt->bind_param("s", $email);
                 $stmt->execute();
                 $user = $stmt->get_result()->fetch_assoc();
@@ -74,8 +74,8 @@ class DbHandler {
      * @param String $name name text
      * @param String $email email status
      */
-    public function updateUser($id, $name, $email) {
-        $stmt = $this->conn->prepare("UPDATE users SET name = ?, email = ? WHERE id = ?");
+    /*public function updateUser($id, $name, $email) {
+        $stmt = $this->conn->prepare("UPDATE tb_m_users SET name = ?, email = ? WHERE id = ?");
         $stmt->bind_param("ssi", $name, $email, $id);
         $stmt->execute();
         $num_affected_rows = $stmt->affected_rows;
@@ -86,15 +86,30 @@ class DbHandler {
 
         // Check for successful insertion
             if ($result) {
-                $stmt = $this->conn->prepare("SELECT * FROM users WHERE email = ?");
+                $stmt = $this->conn->prepare("SELECT * FROM tb_m_users WHERE email = ?");
                 $stmt->bind_param("s", $email);
                 $stmt->execute();
                 $user = $stmt->get_result()->fetch_assoc();
                 $stmt->close();
                 // User successfully inserted
                 return $user;
-            }
+            } 
 
+        return $num_affected_rows > 0;
+    }*/
+
+    /**
+     * Updating task
+     * @param String $task_id id of the task
+     * @param String $task task text
+     * @param String $status task status
+     */
+    public function updateProfile($id, $name, $email) {
+        $stmt = $this->conn->prepare("UPDATE tb_m_users SET name = ?, email = ? WHERE id = ?");
+        $stmt->bind_param("ssi", $name, $email, $id);
+        $stmt->execute();
+        $num_affected_rows = $stmt->affected_rows;
+        $stmt->close();
         return $num_affected_rows > 0;
     }
 
@@ -106,7 +121,7 @@ class DbHandler {
      */
     public function checkLogin($email, $password) {
         // fetching user by email
-        $stmt = $this->conn->prepare("SELECT password_hash FROM users WHERE email = ?");
+        $stmt = $this->conn->prepare("SELECT password_hash FROM tb_m_users WHERE email = ?");
 
         $stmt->bind_param("s", $email);
 
@@ -145,7 +160,7 @@ class DbHandler {
      * @return boolean
      */
     private function isUserExists($email) {
-        $stmt = $this->conn->prepare("SELECT id from users WHERE email = ?");
+        $stmt = $this->conn->prepare("SELECT id from tb_m_users WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $stmt->store_result();
@@ -159,7 +174,7 @@ class DbHandler {
      * @param String $email User email id
      */
     public function getUserByEmail($email) {
-        $stmt = $this->conn->prepare("SELECT id, name, email, mobile, api_key, status, created_at FROM users WHERE email = ?");
+        $stmt = $this->conn->prepare("SELECT id, name, email, mobile, api_key, status, created_at FROM tb_m_users WHERE email = ?");
         $stmt->bind_param("s", $email);
         if ($stmt->execute()) {
             // $user = $stmt->get_result()->fetch_assoc();
@@ -185,7 +200,7 @@ class DbHandler {
      * @param String $user_id user id primary key in user table
      */
     public function getApiKeyById($user_id) {
-        $stmt = $this->conn->prepare("SELECT api_key FROM users WHERE id = ?");
+        $stmt = $this->conn->prepare("SELECT api_key FROM tb_m_users WHERE id = ?");
         $stmt->bind_param("i", $user_id);
         if ($stmt->execute()) {
             // $api_key = $stmt->get_result()->fetch_assoc();
@@ -203,7 +218,7 @@ class DbHandler {
      * @param String $api_key user api key
      */
     public function getUserId($api_key) {
-        $stmt = $this->conn->prepare("SELECT id FROM users WHERE api_key = ?");
+        $stmt = $this->conn->prepare("SELECT id FROM tb_m_users WHERE api_key = ?");
         $stmt->bind_param("s", $api_key);
         if ($stmt->execute()) {
             $stmt->bind_result($user_id);
@@ -224,7 +239,7 @@ class DbHandler {
      * @return boolean
      */
     public function isValidApiKey($api_key) {
-        $stmt = $this->conn->prepare("SELECT id from users WHERE api_key = ?");
+        $stmt = $this->conn->prepare("SELECT id from tb_m_users WHERE api_key = ?");
         $stmt->bind_param("s", $api_key);
         $stmt->execute();
         $stmt->store_result();
@@ -293,6 +308,33 @@ class DbHandler {
         } else {
             return NULL;
         }
+    }
+
+    /**
+     * Create By : Muhammad Sholihin
+     * Create Date : 25/03/2017
+     * Description : Fetching all restaurant
+     */
+    public function getAllRestaurant() {
+        $stmt = $this->conn->prepare("SELECT * FROM tb_m_rm");
+        $stmt->execute();
+        $list = $stmt->get_result();
+        $stmt->close();
+        return $list;
+    }
+
+    /**
+     * Create By : Muhammad Sholihin
+     * Create Date : 25/03/2017
+     * Description : Fetching all menu
+     */
+    public function getAllMenu($id) {
+        $stmt = $this->conn->prepare("SELECT food_name, food_caption, food_price, food_image, rm_name, rm_alamat, rm_phone, rm_image FROM tb_m_menu JOIN tb_m_rm ON tb_m_menu.id_rm = tb_m_rm.id WHERE id_rm = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $list = $stmt->get_result();
+        $stmt->close();
+        return $list;
     }
 
     /**

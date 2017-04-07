@@ -1,16 +1,24 @@
-URL API LAPAR :
+URL API LAPAR FOR USER :
 
 Proses Login
-URL 		: http://localhost/lapar/v1/login
+URL 		: http://localhost/lapar/user/v1/login
 Method 		: POST
 Parameter	: Email, Password
 
 Proses Registrasi
-URL		: http://localhost/lapar/v1/register
+URL		: http://localhost/lapar/user/v1/register
 Method		: POST
 Parameter	: Name, Email, Password, Mobile
 
 Proses Update Profile
-URL		: http://localhost/lapar/v1/register
+URL		: http://localhost/lapar/user/v1/profile_update
+Method		: POST
+Parameter	: Name, Email
+
+Proses Get RM   
+URL             : http://localhost/lapat/user/culinar
 Method		: GET
-Parameter	: id, Authorization
+
+Proses Get RM & Menu
+URL             : http://localhost/lapat/user/culinar/:id
+Method		: GET
